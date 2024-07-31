@@ -109,6 +109,7 @@
               libpsm2
               libffi_3_3
               tbb_2021_8
+              gcc
             ];
             installPhase = with pkgs; ''
               mkdir -p $out
@@ -131,5 +132,24 @@
             '';
           };
           packages.default = hpcKit;
+
+
+
+          dockerImage = pkgs.dockerTools.buildLayeredImage {
+            name = "intel-hpc-kit";
+            tag = "latest";
+            fromImage = pkgs.dockerTools.pullImage {
+              imageName = "wangyinz/nix_test_impi";
+              imageDigest = "sha256:4d4f3ae7755700152b1e2982d5208b5eaf385176a4f956fc531db587dd788b8a";
+              sha256 = "sha256-bsdmcglYypqw1HaA3Vg1d4HZvXa+V0WOgqOhLj+n9YI=";
+              os = "linux";
+              arch = "x86_64";
+            };
+            contents = [ hpcKit ];
+            config = {
+              Cmd = [ "${pkgs.bash}/bin/bash" ];
+            };
+          };
+
         });
 }
