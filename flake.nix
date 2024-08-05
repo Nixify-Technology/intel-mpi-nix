@@ -133,9 +133,7 @@
           };
           packages.default = hpcKit;
 
-
-
-          dockerImage = pkgs.dockerTools.buildLayeredImage {
+          packages.dockerImage = pkgs.dockerTools.buildLayeredImage {
             name = "intel-hpc-kit";
             tag = "latest";
             fromImage = pkgs.dockerTools.pullImage {
@@ -145,7 +143,11 @@
               os = "linux";
               arch = "x86_64";
             };
-            contents = [ hpcKit ];
+            contents = pkgs.buildEnv {
+              name = "image-root";
+              paths = [ hpcKit ];
+              extraPrefix = "/tacc";
+            };
             config = {
               Cmd = [ "${pkgs.bash}/bin/bash" ];
             };
