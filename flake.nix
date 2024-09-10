@@ -121,6 +121,11 @@
               ln -s $out/opt/intel/oneapi/mpi/2021.10.0/bin $out/bin
               ln -s $out/opt/intel/oneapi/mpi/2021.10.0/env $out/env
               ln -s $out/opt/intel/oneapi/mpi/2021.10.0/lib $out/lib
+
+              # workaround to use gfortran with intel mpi
+              ln -sf \
+                $out/opt/intel/oneapi/mpi/2021.10.0/include/gfortran/10.2.0/mpi.mod \
+                $out/opt/intel/oneapi/mpi/2021.10.0/include/mpi.mod
             '';
           };
         in
