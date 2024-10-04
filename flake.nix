@@ -20,6 +20,7 @@
         (system:
         let
           pkgs = import nixpkgs { inherit system; };
+          oneapi-version = "2021.10.0";
           shell = shell-utils.myShell.${system};
           debPackages = [
             {
@@ -92,6 +93,7 @@
             dontBuild = true;
             nativeBuildInputs = with pkgs; [
               autoPatchelfHook
+              makeWrapper
             ];
             buildInputs = with pkgs; [
               zlib
@@ -110,6 +112,7 @@
               libffi_3_3
               tbb_2021_8
               gcc
+              findutils
             ];
             installPhase = with pkgs; ''
               mkdir -p $out
@@ -118,14 +121,20 @@
                 # mkdir -p $out/$deb
                 ${dpkg}/bin/dpkg-deb -x $deb $out
               done
-              ln -s $out/opt/intel/oneapi/mpi/2021.10.0/bin $out/bin
-              ln -s $out/opt/intel/oneapi/mpi/2021.10.0/env $out/env
-              ln -s $out/opt/intel/oneapi/mpi/2021.10.0/lib $out/lib
+              # ln -s $out/opt/intel/oneapi/mpi/2021.10.0/bin $out/bin
+              ln -s $out/opt/intel/oneapi/mpi/${oneapi-version}/env $out/env
+              ln -s $out/opt/intel/oneapi/mpi/${oneapi-version}/lib $out/lib
+
+              # Wrap binaries for executing `source vars.sh`
+              for bin in $(find $out/opt/intel/oneapi/mpi/${oneapi-version}/bin/ -type f); do
+                makeWrapper "$bin" "$out/bin/$(basename $bin)" \
+                  --run "source $out/env/vars.sh \"\""
+              done
 
               # workaround to use gfortran with intel mpi
               ln -sf \
-                $out/opt/intel/oneapi/mpi/2021.10.0/include/gfortran/10.2.0/mpi.mod \
-                $out/opt/intel/oneapi/mpi/2021.10.0/include/mpi.mod
+                $out/opt/intel/oneapi/mpi/${oneapi-version}/include/gfortran/10.2.0/mpi.mod \
+                $out/opt/intel/oneapi/mpi/${oneapi-version}/include/mpi.mod
             '';
           };
         in
@@ -133,9 +142,6 @@
           devShells.default = shell {
             name = "Intel-HPC-Kit";
             packages = [ hpcKit ];
-            shellHook = ''
-              source ${hpcKit}/env/vars.sh
-            '';
           };
           packages.default = hpcKit;
 
