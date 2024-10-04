@@ -28,6 +28,18 @@ nix develop github:waltermoreira/intel-mpi-nix
 ```
 and use the environment to compile your own sources.
 
+### Composing with other flakes
+
+Code that compiles using other MPI implementations (for example, `nixpkgs.mpich`) can
+use this flake as a drop-in replacement.
+
+1. Add the input `intel-mpi.url = "github:Nixify-Technology/intel-mpi-nix"` to your flake.
+2. Instantiate the default package with:
+   ```
+   mpi = intel-mpi.packages.${system}.default;
+   ```
+3. Use the package `mpi` as a replacement for `mpich` or any other implementation.
+
 ## To Do
 
 - Support ARM architecture.
