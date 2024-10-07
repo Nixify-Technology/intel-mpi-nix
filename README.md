@@ -44,6 +44,12 @@ use this flake as a drop-in replacement.
 
 - Support ARM architecture.
 
+## Authors
+
+- Walter Moreira, `@waltermoreira`
+- Joe Stubbs, `@joestubbs`
+- Ian Wang, `@wangyinz`
+
 ## License 
 
 MIT
